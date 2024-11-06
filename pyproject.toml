@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "faker-etl"
+version = "0.1.0"
+description = ""
+authors = ["Paul Bennett <pbennett.uk@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+faker = "^30.8.0"
+tomli = "^2.0.2"
+psycopg2-binary = "^2.9.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

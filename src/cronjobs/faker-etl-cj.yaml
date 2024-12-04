@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: faker-etl
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: faker-etl
+              image: 192.168.5.100:5000/faker-etl:0.0.1
+              imagePullPolicy: IfNotPresent
+          restartPolicy: OnFailure

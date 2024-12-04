@@ -4,7 +4,7 @@ db = psycopg2.connect(
     dbname="postgres",
     user="postgres",
     password="password",
-    host="192.168.6.1",
+    host="192.168.5.81",
     port="5432",
 )
 
@@ -16,29 +16,20 @@ def create_user_fact_table() -> bool:
             with conn.cursor() as curs:
                 curs.execute(
                     """
-                    CREATE TABLE IF NOT EXISTS fact.users (
+                    CREATE TABLE IF NOT EXISTS fact.users_pii (
                        uuid UUID PRIMARY KEY,
-                       timestamp DATE,
+                       ts TIMESTAMP,
                        first_name VARCHAR,
                        last_name VARCHAR,
                        email VARCHAR,
                        phone VARCHAR,
                        address VARCHAR,
-                       city VARCHAR,
                        country VARCHAR,
-                       zip VARCHAR,
-                       company_suffix VARCHAR,
+                       company VARCHAR,
                        job_title VARCHAR,
-                       bank_country VARCHAR,
-                       bban VARCHAR,
-                       iban VARCHAR,
-                       credit_card_number INT,
-                       credit_card_secuirty_code INT,
                        ip_address VARCHAR,
                        mac_address VARCHAR,
-                       user_agent VARCHAR,
-                       passport_dob DATE,
-                       passport_number VARCHAR  
+                       user_agent VARCHAR
                    );
                     """
                 )
@@ -49,33 +40,23 @@ def create_user_fact_table() -> bool:
     return True
 
 
-def insert_user_into_fact_table(insert_data: list, query: str) -> bool:
+def insert_user_into_fact_table(insert_data: list) -> bool:
 
     values = [
         (
             d["uuid"],
-            d["timestamp"],
+            d["ts"],
             d["first_name"],
             d["last_name"],
             d["email"],
             d["phone"],
             d["address"],
-            d["city"],
             d["country"],
-            d["zip"],
             d["company"],
-            d["company_suffix"],
             d["job_title"],
-            d["bank_country"],
-            d["bban"],
-            d["iban"],
-            d["credit_card_number"],
-            d["credit_card_security_code"],
             d["ip_address"],
             d["mac_address"],
             d["user_agent"],
-            d["passport_dob"],
-            d["passport_number"],
         )
         for d in insert_data
     ]
@@ -83,8 +64,14 @@ def insert_user_into_fact_table(insert_data: list, query: str) -> bool:
     try:
         with db as conn:
             with conn.cursor() as curs:
-                curs.executemany(query, values)
-
+                curs.executemany(
+                    """
+                    INSERT INTO fact.users_pii
+                    (uuid, ts, first_name, last_name, email, phone, address, country, company, job_title, ip_address, mac_address, user_agent)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    values,
+                ),
     except Exception as e:
         raise e
 
